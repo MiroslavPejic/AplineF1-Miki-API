@@ -21,7 +21,11 @@ namespace AplineF1_Miki_API.Controllers
         [Route("GetCircuits")]
         public JsonResult GetCircuits()
         {
-            string query = "select * from dbo.circuits";
+            string query = "select " +
+                "track_name," +
+                "track_location," +
+                "date_added " +
+                "from dbo.circuits";
             DataTable table = new DataTable();
             string sqlDatasource = _configuration.GetConnectionString("alpineF1DbConnection");
 
