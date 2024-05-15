@@ -69,6 +69,35 @@ namespace AplineF1_Miki_API.Controllers
             return new JsonResult(table);
         }
 
+        [HttpGet]
+        [Route("GetTyreDegradationCoefficient")]
+        public JsonResult GetTyreDegradationCoefficient()
+        {
+            string query = "select " +
+                "id, " +
+                "type, " +
+                "degradationCoefficient " +
+                "FROM dbo.tyre_degradation_coefficient";
+
+            DataTable table = new DataTable();
+            string sqlDatasource = _configuration.GetConnectionString("alpineF1DbConnection");
+
+            SqlDataReader myReader;
+            using (SqlConnection myConn = new SqlConnection(sqlDatasource))
+            {
+                myConn.Open();
+                using (SqlCommand myCommand = new SqlCommand(query, myConn))
+                {
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+                    myReader.Close();
+                    myConn.Close();
+                }
+            }
+
+            return new JsonResult(table);
+        }
+
         [HttpPost]
         [Route("GetTyre")]
         public JsonResult GetTyre([FromForm] string id)
@@ -127,6 +156,39 @@ namespace AplineF1_Miki_API.Controllers
                     myCommand.Parameters.AddWithValue("@family", family);
                     myCommand.Parameters.AddWithValue("@type", type);
                     myCommand.Parameters.AddWithValue("@placement", placement);
+                    myCommand.Parameters.AddWithValue("@degradationCoefficient", degradationCoefficient);
+                    myCommand.Parameters.AddWithValue("@id", id);
+
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+                    myReader.Close();
+                    myConn.Close();
+                }
+            }
+
+            return new JsonResult(table);
+        }
+
+        [HttpPost]
+        [Route("UpdateTyreDegradationCoefficient")]
+        public JsonResult UpdateTyreDegradationCoefficient(
+            [FromForm] string id,
+            [FromForm] string degradationCoefficient
+            )
+        {
+            string query = "update dbo.tyre_degradation_coefficient set " +
+                "degradationCoefficient = @degradationCoefficient " +
+                "where id = @id";
+
+            DataTable table = new DataTable();
+            string sqlDatasource = _configuration.GetConnectionString("alpineF1DbConnection");
+
+            SqlDataReader myReader;
+            using (SqlConnection myConn = new SqlConnection(sqlDatasource))
+            {
+                myConn.Open();
+                using (SqlCommand myCommand = new SqlCommand(query, myConn))
+                {
                     myCommand.Parameters.AddWithValue("@degradationCoefficient", degradationCoefficient);
                     myCommand.Parameters.AddWithValue("@id", id);
 
