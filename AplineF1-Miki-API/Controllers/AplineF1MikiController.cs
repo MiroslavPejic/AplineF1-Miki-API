@@ -22,6 +22,7 @@ namespace AplineF1_Miki_API.Controllers
         public JsonResult GetCircuits()
         {
             string query = "select " +
+                "id, " +
                 "track_name," +
                 "track_location," +
                 "date_added " +
@@ -35,6 +36,40 @@ namespace AplineF1_Miki_API.Controllers
                 myConn.Open();
                 using(SqlCommand myCommand = new SqlCommand(query,myConn)) 
                 {
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+                    myReader.Close();
+                    myConn.Close();
+                }
+            }
+
+            return new JsonResult(table);
+        }
+
+        [HttpPost]
+        [Route("GetCircuitPoints")]
+        public JsonResult GetCircuitPoints(
+            [FromForm] string id
+            )
+        {
+            string query = "select " +
+                "id, " +
+                "track_name," +
+                "track_location," +
+                "circuit_points " +
+                "from dbo.circuits " +
+                "WHERE id = @id";
+            DataTable table = new DataTable();
+            string sqlDatasource = _configuration.GetConnectionString("alpineF1DbConnection");
+
+            SqlDataReader myReader;
+            using (SqlConnection myConn = new SqlConnection(sqlDatasource))
+            {
+                myConn.Open();
+                using (SqlCommand myCommand = new SqlCommand(query, myConn))
+                {
+                    myCommand.Parameters.AddWithValue("@id", id);
+
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
                     myReader.Close();
